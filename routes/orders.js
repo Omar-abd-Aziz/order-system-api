@@ -3,9 +3,12 @@ const express = require('express');
 const router = express.Router();
 const Order = require('../models/order');
 
+const verifyToken = require('../middleware/verifyToken'); // Path to your verifyToken middleware
+
+
 
 // add new order
-router.post('/add', async (req, res) => {
+router.post('/add', verifyToken, async (req, res) => {
   const { orderNumber, name, nameOfAdmin, phone, city, order, detailedOrder, price, date, numberToOrderBy } = req.body;
 
   // Validate required fields and data types
@@ -173,7 +176,7 @@ router.get('/', async (req, res) => {
 
 
 // الحصول على طلب معين
-router.get('/:id', async (req, res) => {
+router.get('/:id', verifyToken, async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
     if (order == null) {
@@ -194,7 +197,7 @@ router.get('/:id', async (req, res) => {
 
 
 // تعديل طلب معين
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', verifyToken, async (req, res) => {
   try {
     const orderData = await Order.findById(req.params.id);
     if (orderData == null) {
@@ -254,7 +257,7 @@ router.patch('/:id', async (req, res) => {
 
 
 // حذف طلب معين
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', verifyToken, async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
     if (order == null) {

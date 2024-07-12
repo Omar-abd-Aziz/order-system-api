@@ -28,6 +28,13 @@ app.use('/goal', goalRouter);
 const adminCodeRouter = require('./routes/adminCode');
 app.use('/admin-code', adminCodeRouter);
 
+
+const accountRouter = require('./routes/auth');
+app.use('/auth', accountRouter);
+
+const tokenRouter = require('./routes/token');
+app.use('/token', tokenRouter);
+
 // Create HTTP Server
 const server = http.createServer(app);
 

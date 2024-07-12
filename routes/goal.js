@@ -52,13 +52,13 @@ router.get('/:date', async (req, res) => {
         const goal = await Goal.findOne({ date });
 
         if (!goal) {
-            return res.status(404).json({ error: 'Goal not found' });
+            return res.status(404).json({ "statue": false,error: 'Goal not found' });
         }
 
-        res.status(200).json(goal);
+        res.status(200).json({"statue": true, "goal": goal});
     } catch (err) {
         console.error('Error fetching goal:', err);
-        res.status(500).json({ error: 'Failed to fetch goal' });
+        res.status(500).json({ "statue": false,error: 'Failed to fetch goal' });
     }
 });
 
