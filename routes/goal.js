@@ -2,26 +2,36 @@
 const express = require('express');
 const router = express.Router();
 const Goal = require('../models/goal'); // Adjust path as necessary
+const verifyToken = require('../middleware/verifyToken');
+
+
 
 // POST endpoint to save or update a goal
-router.post('/', async (req, res) => {
-    const { totalPrice ,goal, date, count } = req.body;
+router.post('/',verifyToken, async (req, res) => {
+    const idOfAdmin = req.query.idOfAdmin;
+
+    // Check if idOfAdmin is provided
+    if (!idOfAdmin) {
+      return res.status(400).json({ message: 'idOfAdmin is required.' });
+    }
+
+    const { totalPrice, goal, date, count } = req.body;
 
     try {
-        // Check if a goal with the same date exists
-        let existingGoal = await Goal.findOne({ date });
+        // Check if a goal with the same date and idOfAdmin exists
+        let existingGoal = await Goal.findOne({ date, idOfAdmin });
 
         if (existingGoal) {
-            // If goal exists for this date, update it
+            // If goal exists for this date and idOfAdmin, update it
             existingGoal.goal = goal; // Update the goal value
-            existingGoal.count = count; // Update the goal value
-            existingGoal.totalPrice = totalPrice; // Update the goal value
+            existingGoal.count = count; // Update the count value
+            existingGoal.totalPrice = totalPrice; // Update the totalPrice value
             await existingGoal.save(); // Save the updated goal
 
             res.status(200).json(existingGoal); // Respond with the updated goal
         } else {
-            // If no goal exists for this date, create a new one
-            const newGoal = new Goal({ totalPrice ,goal, date, count });
+            // If no goal exists for this date and idOfAdmin, create a new one
+            const newGoal = new Goal({ totalPrice, goal, date, count, idOfAdmin });
             await newGoal.save();
 
             res.status(201).json(newGoal); // Respond with the newly created goal
@@ -32,33 +42,59 @@ router.post('/', async (req, res) => {
     }
 });
 
-// GET endpoint to retrieve all goals
-router.get('/', async (req, res) => {
-    try {
-        const goals = await Goal.find();
 
-        res.status(200).json(goals);
+
+
+
+
+// GET endpoint to retrieve all goals with idOfAdmin
+router.get('/',verifyToken, async (req, res) => {
+    const idOfAdmin = req.query.idOfAdmin;
+
+    // Check if idOfAdmin is provided
+    if (!idOfAdmin) {
+        return res.status(400).json({ message: 'idOfAdmin is required.' });
+    }
+
+    try {
+        // Find all goals for the specified idOfAdmin
+        const goals = await Goal.find({ idOfAdmin });
+
+        res.status(200).json({ status: true, goals });
     } catch (err) {
         console.error('Error fetching goals:', err);
-        res.status(500).json({ error: 'Failed to fetch goals' });
+        res.status(500).json({ status: false, error: 'Failed to fetch goals' });
     }
 });
 
-// GET endpoint to retrieve a specific goal by date
-router.get('/:date', async (req, res) => {
+
+
+
+
+
+// GET endpoint to retrieve a specific goal by date and idOfAdmin
+router.get('/:date',verifyToken, async (req, res) => {
+    const idOfAdmin = req.query.idOfAdmin;
+
+    // Check if idOfAdmin is provided
+    if (!idOfAdmin) {
+      return res.status(400).json({ message: 'idOfAdmin is required.' });
+    }
+
     const { date } = req.params;
 
     try {
-        const goal = await Goal.findOne({ date });
+        // Find the goal by date and idOfAdmin
+        const goal = await Goal.findOne({ date, idOfAdmin });
 
         if (!goal) {
-            return res.status(404).json({ "statue": false,error: 'Goal not found' });
+            return res.status(404).json({ status: false, error: 'Goal not found' });
         }
 
-        res.status(200).json({"statue": true, "goal": goal});
+        res.status(200).json({ status: true, goal });
     } catch (err) {
         console.error('Error fetching goal:', err);
-        res.status(500).json({ "statue": false,error: 'Failed to fetch goal' });
+        res.status(500).json({ status: false, error: 'Failed to fetch goal' });
     }
 });
 
@@ -66,24 +102,33 @@ router.get('/:date', async (req, res) => {
 
 
 
-// DELETE endpoint to delete a goal by date
-router.delete('/:date', async (req, res) => {
+
+
+// DELETE endpoint to delete a goal by date and idOfAdmin
+router.delete('/:date',verifyToken, async (req, res) => {
+    const idOfAdmin = req.query.idOfAdmin;
+
+    // Check if idOfAdmin is provided
+    if (!idOfAdmin) {
+        return res.status(400).json({ message: 'idOfAdmin is required.' });
+    }
+
     const { date } = req.params;
 
     try {
-        const deletedGoal = await Goal.findOneAndDelete({ date });
+        // Attempt to find and delete the goal by date and idOfAdmin
+        const deletedGoal = await Goal.findOneAndDelete({ date, idOfAdmin });
 
         if (!deletedGoal) {
-            return res.status(404).json({ error: 'Goal not found' });
+            return res.status(404).json({ status: false, error: 'Goal not found' });
         }
 
-        res.status(200).json({ message: 'Goal deleted successfully', deletedGoal });
+        res.status(200).json({ status: true, message: 'Goal deleted successfully', deletedGoal });
     } catch (err) {
         console.error('Error deleting goal:', err);
-        res.status(500).json({ error: 'Failed to delete goal' });
+        res.status(500).json({ status: false, error: 'Failed to delete goal' });
     }
 });
-
 
 
 

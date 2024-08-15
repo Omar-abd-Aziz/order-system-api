@@ -35,17 +35,40 @@ app.use('/auth', accountRouter);
 const tokenRouter = require('./routes/token');
 app.use('/token', tokenRouter);
 
+
+
+
+
+
 // Create HTTP Server
 const server = http.createServer(app);
 
 // Setup WebSocket Server
 const wss = new WebSocket.Server({ server });
 
+// Store clients with their corresponding idOfAdmin
+const clients = new Map();
+
 wss.on('connection', (ws) => {
   console.log('Client connected');
-  
+
+  // Listen for the idOfAdmin from the client
+  ws.on('message', (message) => {
+    try {
+      const data = JSON.parse(message);
+      if (data.idOfAdmin) {
+        // Store the idOfAdmin for this client
+        clients.set(ws, data.idOfAdmin);
+        console.log(`Client registered with idOfAdmin: ${data.idOfAdmin}`);
+      }
+    } catch (error) {
+      console.error('Error parsing message from client:', error);
+    }
+  });
+
   ws.on('close', () => {
     console.log('Client disconnected');
+    clients.delete(ws); // Remove the client from the map when it disconnects
   });
 });
 
@@ -53,16 +76,18 @@ wss.on('connection', (ws) => {
 const db = mongoose.connection;
 db.once('open', () => {
   console.log('Connected to MongoDB');
-  
+
   const orderCollection = db.collection('orders');
   const changeStream = orderCollection.watch();
 
   changeStream.on('change', (change) => {
     console.log('A change occurred:', change);
 
-    // Broadcast changes to all connected clients
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
+    const idOfAdmin = change.fullDocument?.idOfAdmin || change.documentKey?.idOfAdmin;
+
+    // Broadcast changes to relevant clients
+    clients.forEach((clientIdOfAdmin, client) => {
+      if (client.readyState === WebSocket.OPEN && clientIdOfAdmin === idOfAdmin) {
         client.send(JSON.stringify(change));
       }
     });
