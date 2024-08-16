@@ -9,7 +9,7 @@ const verifyToken = require('../middleware/verifyToken'); // Path to your verify
 
 // add new order
 router.post('/add', verifyToken, async (req, res) => {
-  const { orderNumber, name, nameOfAdmin, idOfAdmin, emailOfAdmin, phone, city, order, detailedOrder, price, date, numberToOrderBy } = req.body;
+  const { orderNumber, name, nameOfAdmin, idOfAdmin, emailOfAdmin, phone, city, order, detailedOrder, price, date, numberToOrderBy,PersonFacebookLink,PersonInstgramLink,PersonTikTokLink,PersonTelegramLink,PersonWebsiteLink } = req.body;
 
   // Validate required fields and data types
   if (!orderNumber || !name || !nameOfAdmin || !idOfAdmin || !emailOfAdmin || !phone || !city || !order || !detailedOrder || !price || !date || !numberToOrderBy) {
@@ -27,7 +27,7 @@ router.post('/add', verifyToken, async (req, res) => {
         detailedOrder: !!detailedOrder,
         price: !!price,
         date: !!date,
-        numberToOrderBy: !!numberToOrderBy,
+        numberToOrderBy: !!numberToOrderBy
       },
     });
   }
@@ -56,7 +56,12 @@ router.post('/add', verifyToken, async (req, res) => {
       detailedOrder,
       price, 
       date,
-      numberToOrderBy, 
+      numberToOrderBy,
+      PersonFacebookLink,
+      PersonInstgramLink,
+      PersonTikTokLink,
+      PersonTelegramLink,
+      PersonWebsiteLink
     });
 
     try {
@@ -226,7 +231,7 @@ router.patch('/:id', verifyToken, async (req, res) => {
     }
 
     // التأكد من أن جميع الحقول المطلوبة موجودة في الطلب
-    const { name, phone, city, order, detailedOrder, price } = req.body;
+    const { name, phone, city, order, detailedOrder, price,PersonFacebookLink,PersonInstgramLink,PersonTikTokLink,PersonTelegramLink,PersonWebsiteLink } = req.body;
     if (!name || !phone || !city || !order || !detailedOrder || !price) {
       return res.status(400).json({ 
         message: 'Missing required fields',
@@ -256,6 +261,12 @@ router.patch('/:id', verifyToken, async (req, res) => {
     orderData.order = order;
     orderData.detailedOrder = detailedOrder;
     orderData.price = parsedPrice;
+
+    orderData.PersonFacebookLink = PersonFacebookLink;
+    orderData.PersonInstgramLink = PersonInstgramLink;
+    orderData.PersonTikTokLink = PersonTikTokLink;
+    orderData.PersonTelegramLink = PersonTelegramLink;
+    orderData.PersonWebsiteLink = PersonWebsiteLink;
 
     const updatedOrder = await orderData.save();
     res.json(updatedOrder);

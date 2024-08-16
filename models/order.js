@@ -13,7 +13,12 @@ const orderSchema = new mongoose.Schema({
   detailedOrder: { type: String, required: true },
   price: { type: Number, required: true },
   date: { type: String, required: true },
-  numberToOrderBy: { type: Number, required: true }
+  numberToOrderBy: { type: Number, required: true },
+  PersonFacebookLink: { type: String, required: false },
+  PersonInstgramLink: { type: String, required: false },
+  PersonTikTokLink: { type: String, required: false },
+  PersonTelegramLink: { type: String, required: false },
+  PersonWebsiteLink: { type: String, required: false },
 });
 
 const Order = mongoose.model('Order', orderSchema);
