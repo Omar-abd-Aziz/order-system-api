@@ -10,7 +10,8 @@ const verifyAdminCode = require('../middleware/verfiyAdminCode'); // Path to you
 
 
 const admin = require('firebase-admin');
-const serviceAccount = require('../firebase/order-system-node-js-firebase-adminsdk-ipv35-d87e49e05d.json'); // Provide the path to your service account key
+require('dotenv').config();
+const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
 
 
 
