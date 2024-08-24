@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const AdminCode = require('../models/adminCode'); // Adjust path as necessary
 
 
 let adminCode = "omarvenom123";
