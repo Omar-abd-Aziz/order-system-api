@@ -19,6 +19,7 @@ const orderSchema = new mongoose.Schema({
   PersonTikTokLink: { type: String, required: false },
   PersonTelegramLink: { type: String, required: false },
   PersonWebsiteLink: { type: String, required: false },
+  labels: { type: Array, required: false },
 });
 
 const Order = mongoose.model('Order', orderSchema);

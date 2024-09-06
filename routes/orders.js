@@ -9,7 +9,7 @@ const verifyToken = require('../middleware/verifyToken'); // Path to your verify
 
 // add new order
 router.post('/add', verifyToken, async (req, res) => {
-  const { orderNumber, name, nameOfAdmin, idOfAdmin, emailOfAdmin, phone, city, order, detailedOrder, price, date, numberToOrderBy,PersonFacebookLink,PersonInstgramLink,PersonTikTokLink,PersonTelegramLink,PersonWebsiteLink } = req.body;
+  const { orderNumber, name, nameOfAdmin, idOfAdmin, emailOfAdmin, phone, city, order, detailedOrder, price, date, numberToOrderBy,PersonFacebookLink,PersonInstgramLink,PersonTikTokLink,PersonTelegramLink,PersonWebsiteLink ,labels } = req.body;
 
   // Validate required fields and data types
   if (!orderNumber || !name || !nameOfAdmin || !idOfAdmin || !emailOfAdmin || !phone || !city || !order || !detailedOrder || !price || !date || !numberToOrderBy) {
@@ -61,7 +61,8 @@ router.post('/add', verifyToken, async (req, res) => {
       PersonInstgramLink,
       PersonTikTokLink,
       PersonTelegramLink,
-      PersonWebsiteLink
+      PersonWebsiteLink,
+      labels
     });
 
     try {
@@ -116,6 +117,8 @@ router.get('/',verifyToken, async (req, res) => {
 
   // Parse search queries from query parameters
   const searchParams = req.query.searchParams;
+
+
   if (searchParams) {
     const queryParams = searchParams.split(',');
     for (const param of queryParams) {
@@ -123,9 +126,10 @@ router.get('/',verifyToken, async (req, res) => {
       if (field && value) {
         if (field === 'price' || field === 'orderNumber') {
           searchQuery[field] = parseFloat(value);
-        } else {
+        }  else {
           searchQuery[field] = { $regex: value, $options: 'i' };
         }
+
       }
     }
   }
@@ -231,7 +235,7 @@ router.patch('/:id', verifyToken, async (req, res) => {
     }
 
     // التأكد من أن جميع الحقول المطلوبة موجودة في الطلب
-    const { name, phone, city, order, detailedOrder, price,PersonFacebookLink,PersonInstgramLink,PersonTikTokLink,PersonTelegramLink,PersonWebsiteLink } = req.body;
+    const { name, phone, city, order, detailedOrder, price,PersonFacebookLink,PersonInstgramLink,PersonTikTokLink,PersonTelegramLink,PersonWebsiteLink,labels } = req.body;
     if (!name || !phone || !city || !order || !detailedOrder || !price) {
       return res.status(400).json({ 
         message: 'Missing required fields',
@@ -267,6 +271,8 @@ router.patch('/:id', verifyToken, async (req, res) => {
     orderData.PersonTikTokLink = PersonTikTokLink;
     orderData.PersonTelegramLink = PersonTelegramLink;
     orderData.PersonWebsiteLink = PersonWebsiteLink;
+
+    orderData.labels = labels||[];
 
     const updatedOrder = await orderData.save();
     res.json(updatedOrder);

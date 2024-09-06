@@ -35,12 +35,14 @@ app.use('/goal', goalRouter);
 const adminCodeRouter = require('./routes/adminCode');
 app.use('/admin-code', adminCodeRouter);
 
-
 const accountRouter = require('./routes/auth');
 app.use('/auth', accountRouter);
 
 const tokenRouter = require('./routes/token');
 app.use('/token', tokenRouter);
+
+const labelsRoutes = require('./routes/labels');
+app.use('/labels', labelsRoutes);
 
 
 
