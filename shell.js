@@ -178,7 +178,7 @@ Please respond directly to the user's message: "${userMessage}"
     return "I'm sorry, I couldn't understand your request. Please try again.";
   } catch (error) {
     console.error("Error fetching AI response:", error);
-    return "Oops! There’s a temporary issue. Please try again later.";
+    return "";
   }
 };
 
